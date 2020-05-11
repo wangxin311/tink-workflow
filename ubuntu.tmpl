@@ -13,19 +13,19 @@ tasks:
     image: disk-wipe:v3
     timeout: 90
   - name: "disk-partition"
-    image: disk-partition:v3
-    timeout: 600
+    image: disk-partition:v101
+    timeout: 36000
     environment:
-       MIRROR_HOST: 192.168.1.2
+       MIRROR_HOST: 192.168.1.1
     volumes:
       - /statedir:/statedir
   - name: "install-root-fs"
-    image: install-root-fs:v3
+    image: install-root-fs:v101
     timeout: 600
     environment:
        MIRROR_HOST: 192.168.1.2
   - name: "install-grub"
-    image: install-grub:v3
+    image: install-grub:v101
     timeout: 600
     environment:
        MIRROR_HOST: 192.168.1.2
