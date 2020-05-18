@@ -10,30 +10,30 @@ tasks:
     - /lib/firmware:/lib/firmware:ro
   actions:
   - name: "disk-wipe"
-    image: disk-wipe:v101
+    image: disk-wipe:v1
     timeout: 90
   - name: "disk-partition"
     image: disk-partition:v101
-    timeout: 36000
+    timeout: 180
     environment:
        MIRROR_HOST: 192.168.1.1
     volumes:
       - /statedir:/statedir
   - name: "install-root-fs"
-    image: install-root-fs:v101
+    image: install-root-fs:v1
     timeout: 600
     environment:
        MIRROR_HOST: 192.168.1.2
   - name: "install-grub"
-    image: install-grub:v101
+    image: install-grub:v1
     timeout: 600
     environment:
        MIRROR_HOST: 192.168.1.2
     volumes:
       - /statedir:/statedir
   - name: "cloud-init"
-    image: cloud-init:v101
-    timeout: 36000
+    image: cloud-init:v1
+    timeout: 600
     environment:
        MIRROR_HOST: 192.168.1.2
     volumes:

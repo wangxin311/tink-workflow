@@ -1,5 +1,5 @@
 {
-  "id": "af7f870d-6fd1-4dae-a5a3-d5535a0198ac",
+  "id": "74d2dc09-fc57-470d-b298-77f317d48c69",
   "arch": "x86_64",
   "allow_pxe": true,
   "allow_workflow": true,
@@ -14,7 +14,7 @@
      "public": false
     }
   ],
-  "facility_code": "ams1",
+  "facility_code": "onprem",
   "plan_slug":"c3.small.x86",
   "instance": {
       "storage": {
