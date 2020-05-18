@@ -18,10 +18,8 @@ $ wget https://raw.githubusercontent.com/tinkerbell/tink/master/setup.sh && chmo
 $ ./setup.sh
 ```
 
-### Build images
-TODO: More details to be added
+### Build workflow action docker images
 
-Build all workflow action images
 ```
 docker build -t 192.168.1.1/ubuntu:base 00-base/
 docker push 192.168.1.1/ubuntu:base
@@ -37,9 +35,23 @@ docker build -t 192.168.1.1/cloud-init:v1 05-cloud-init/ --build-arg REGISTRY=19
 docker push 192.168.1.1/cloud-init:v1
 ```
 
-Build rootfs/kernel/modules/initrd images
-TODO: add more detials 
+### Build provision images for worker
+Build rootfs/kernel/modules/initrd images, please take packet image build as reference 
+https://github.com/packethost/packet-images
 
+
+```
+root@tink-provisioner:/var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04# ls -l *tar.gz
+-rw-r--r-- 1 root root 688419310 May 15 19:50 image.tar.gz
+-rw-r--r-- 1 root root  25406438 May 15 19:50 initrd.tar.gz
+-rw-r--r-- 1 root root   7927566 May 15 19:50 kernel.tar.gz
+-rw-r--r-- 1 root root  65400456 May 15 19:50 modules.tar.gz
+```
+After you have all the images, you need copy all of them to the OSIE directory
+```
+root@tink-provisioner:/var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04# pwd
+/var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04
+```
 
 ### Configure tink workflow
 
