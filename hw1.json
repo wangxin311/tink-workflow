@@ -1,5 +1,5 @@
 {
-  "id": "$UUID",
+  "id": "af7f870d-6fd1-4dae-a5a3-d5535a0198ac",
   "arch": "x86_64",
   "allow_pxe": true,
   "allow_workflow": true,
@@ -81,7 +81,7 @@
   "network_ports": [
     {
       "data": {
-      "mac": "$MAC"
+      "mac": "b8:59:9f:e0:f6:8c"
       },
       "name": "eth0",
       "type": "data"

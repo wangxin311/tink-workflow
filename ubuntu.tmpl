@@ -3,7 +3,7 @@ name: ubuntu_provisioning
 global_timeout: 6000
 tasks:
 - name: "os-installation"
-  worker: "{{index .Targets "machine1" "mac_addr"}}"
+  worker: "{{.device_1}}"
   volumes:
     - /dev:/dev
     - /dev/console:/dev/console
