@@ -14,7 +14,7 @@
      "public": false
     }
   ],
-  "facility_code": "ams1",
+  "facility_code": "onprem",
   "plan_slug":"c3.small.x86",
   "instance": {
       "storage": {

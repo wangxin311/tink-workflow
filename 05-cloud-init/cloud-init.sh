@@ -93,7 +93,7 @@ cat <<EOF >$target/etc/network/interfaces
 auto lo
 iface lo inet loopback
 #
-auto enp1s0f0
-iface enp1s0f0 inet dhcp
+auto eno2
+iface eno2 inet dhcp
 EOF
 
