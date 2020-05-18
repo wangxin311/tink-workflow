@@ -1,6 +1,6 @@
 # tink-workflow
 
-This is the step by step guide on how to use tinkerbell to provision the baremetal server
+This is the step by step guide on how to setup tink workflow use tinkerbell to provision baremetal server.
 
 ## Getting Started
 
@@ -101,7 +101,6 @@ Reboot worker node will trigger workflow starts and you can monitoring the workf
 | 90e16ddd-a4ce-4591-bb91-3ec1eddd0e2b | os-installation | install-grub    |              5 | Finished Execution Successfully |     ACTION_SUCCESS |
 +--------------------------------------+-----------------+-----------------+----------------+---------------------------------+--------------------+
 ```
-
 
 ## Authors
 
