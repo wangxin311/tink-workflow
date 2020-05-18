@@ -110,9 +110,3 @@ See also the list of [contributors](https://github.com/wangxin311/tink-workflow/
 
 ## License
 
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
