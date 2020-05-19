@@ -24,9 +24,11 @@ curl -sLS https://raw.githubusercontent.com/tinkerbell/tink/master/setup.sh | sh
 ```bash
 
 # Fix Docker from interfering with NAT
+# https://docs.docker.com/network/iptables/
 iptables -I DOCKER-USER -i src_if -o dst_if -j ACCEPT
 
 # Now setup NAT from the internal network to the public network
+# https://www.revsys.com/writings/quicktips/nat.html
 iptables -t nat -A POSTROUTING -o bond0 -j MASQUERADE
 iptables -A FORWARD -i bond0 -o enp1s0f1 -m state   --state RELATED,ESTABLISHED -j ACCEPT
 iptables -A FORWARD -i enp1s0f1 -o bond0 -j ACCEPT 
