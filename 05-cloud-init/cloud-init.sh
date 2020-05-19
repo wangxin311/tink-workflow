@@ -29,14 +29,25 @@ if [ -f $target/etc/cloud/cloud.cfg ]; then
 		package_update: false
 		package_upgrade: false
 		hostname: kw-tf-worker
+		users:
+		 - default
+		 - name: ubuntu
+		   gecos: Default user
+		   groups: admin
+		   sudo: true
+		chpasswd:
+		 list: |
+		   ubuntu:ubuntu
 		bootcmd:
-		 - echo 192.168.1.1 kw-tf-provisioner > /etc/hosts
+		 - echo 192.168.1.1 kw-tf-provisioner |tee -a /etc/hosts
+		 - systemctl disable network-online.target
+		 - systemctl mask network-online.target
 		runcmd:
 		 - touch /etc/cloud/cloud-init.disabled
 		ssh_genkeytypes: ['rsa', 'dsa', 'ecdsa', 'ed25519']
 		ssh_pwauth: True
 		ssh_authorized_keys:
-		 - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiKZts/sKvjhuVC7iod0zSgYlfnH822HqFwkUzsObnKDZcbmv3+gnVHplLlBesK5USVCdOK2Qb4SkjCAeDcsj10ijJfkJlTo8HVKUx4OBXIfOAZyAIhoCgzXTwXReVPeg9uvhRhctiKM2DqXGCAA4ZrwRoXaZy3WntqUhr805XB3waTWXlkbgZEKc9I0G8mN7pI0afJYIjylhRvHad0fCR+zSHogJ/JUVm4+pcfAdP7UfckpBU74lIavm/lbyRBbN0d341GCRWjlO0RKnz9guxqywctuUI6UvOhBU301tckhXsOSfeyWPuzhPOc1xUpXOpPyY/izPpyIIBMSztPr0F root@kw-tf-provisioner
+		 - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8TlZp6SMhZ3OCKxWbRAwOsuk8alXapXb7GQV4DPwZ+ug1AtkDCSSzPGZI6PP3rFILfobQdw6/t/GT3TKwQ1HY2vYqikWXG7YjT6r5IlsaaZ6y3KAuestYx2lG8I+MCbLmvcjo4k2qeJuf2yj331izRkeNRlRx/VWFUAtoCw2Kr2oZK+LbV8Ewv+x6jMVn9+NgxmMj+fHj9ajVtDacVvyJ8cStmRmOyIGd+rPKDb8txJT4FYXIsy5URhioni7QQuJcXN/qqy4TSY+EaYkGUo2j91MuDJZbdQYniOV4ODS8At/a/Ua51x+ia6Y51pCHMvPsm7DFhK13EQUXhIGdPVY3 root@tf-provisioner
 		cloud_init_modules:
 		 - migrator
 		 - bootcmd
@@ -93,7 +104,15 @@ cat <<EOF >$target/etc/network/interfaces
 auto lo
 iface lo inet loopback
 #
-auto eno2
-iface eno2 inet dhcp
+auto enp1s0f0
+iface enp1s0f0 inet dhcp
 EOF
 
+cat <<EOF >$target/etc/netplan/01-netcfg.yaml
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    enp1s0f0:
+      dhcp4: yes
+EOF
