@@ -26,14 +26,23 @@ custom_image=false
 target="/mnt/target"
 cprout=/statedir/cpr.json
 
+is_uefi && uefi=true || uefi=false
 
 # custom
 mkdir -p $target
 mkdir -p $target/boot
 #mount -t efivarfs efivarfs /sys/firmware/efi/efivars
 mount -t ext4 /dev/sda3 $target
-mkdir -p $target/boot/grub2
-mkdir -p /mnt/target/boot/grub2
+#mkdir -p $target/boot/grub2
+#mkdir -p /mnt/target/boot/grub2
+
+if $uefi; then 
+	mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+	mkdir -p $target/boot/efi
+else
+	mkdir -p $target/boot/grub2
+	mkdir -p /mnt/target/boot/grub2
+fi
 
 if ! [[ -f /statedir/disks-partioned-image-extracted ]]; then
     assetdir=/tmp/assets
@@ -101,8 +110,11 @@ if ! [[ -f /statedir/disks-partioned-image-extracted ]]; then
     wget "$grub" -O /tmp/grub.template
     wget "${grub}.default" -O /tmp/grub.default
 
-#    mkfs.vfat -c -F 32 /dev/sda1
-#    mount -t vfat /dev/sda1 $target/boot/grub2
+    if $uefi; then
+	   mkfs.vfat -c -F 32 /dev/sda1
+	   mount -t vfat /dev/sda1 $target/boot/efi
+    fi
+
     ./grub-installer.sh -v -p "$class" -t "$target" -C "$cprout" -D /tmp/grub.default -T /tmp/grub.template
 
     rootuuid=$(jq -r .rootuuid $cprout)
