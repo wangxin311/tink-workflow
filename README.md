@@ -147,12 +147,30 @@ Reboot worker node will trigger workflow starts and you can monitoring the workf
 +--------------------------------------+-----------------+-----------------+----------------+---------------------------------+--------------------+
 ```
 
+Important note: if you need to re-run the provisioning workflow, you need to run `tink workflow create` again.
+
+### Change the boot order
+
+You now need to stop the machine from netbooting.
+
+Go to the Packet dashboard and click "Server Actions" -> "Disable Always PXE boot". This setting can be toggled as required, or if you need to reprovision a machine.
+
+Now reboot the worker machine, and it should show GRUB before booting Ubuntu.
+
+The username and password are both `ubuntu` and this must be changed on first logon. To change or to remove the password edit `./05-cloud-init/cloud-init.sh`.
+
+You can connect with the packet SOS ssh console or over SSH from the worker, the IP should be 192.168.1.5.
+
+```bash
+ssh ubuntu@192.168.1.5
+```
+
 ## Authors
 
 This work is derived [from a sample by Packet and Infracloud](https://github.com/tinkerbell/tink/tree/first-good-workflow/workflow-samples/ubuntu)
 
 * **Xin Wang** - *Initial set of fixes and adding cloud-init* - [tink-workflow](https://github.com/wangxin311/tink-workflow)
-* **Alex Ellis** - Bug fixes, user experience & README
+* **Alex Ellis** - Fixed networking and other bugs, user experience & README
 
 License: Apache 2.0
 
