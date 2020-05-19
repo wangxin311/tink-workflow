@@ -129,10 +129,3 @@ if ! [[ -f /statedir/disks-partioned-image-extracted ]]; then
             ./repos.sh -a "$arch" -t $target -f "$facility" -M "$ephemeral"
     fi
 fi
-echo "####install-grub step check fstab"
-echo "$(cat /mnt/target/etc/fstab)"
-
-if $uefi; then
-    echo "insmod all_video" >> $target/boot/grub/grub.cfg
-fi
-
