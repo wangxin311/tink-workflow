@@ -131,3 +131,8 @@ if ! [[ -f /statedir/disks-partioned-image-extracted ]]; then
 fi
 echo "####install-grub step check fstab"
 echo "$(cat /mnt/target/etc/fstab)"
+
+if $uefi; then
+    echo "insmod all_video" >> $target/boot/grub/grub.cfg
+fi
+
