@@ -1,64 +1,87 @@
 # tink-workflow
 
-This is the step by step guide on how to setup tink workflow use tinkerbell to provision baremetal server.
+With this step-by-step guide, you have everything you need to provision a bare-metal server using the [Tinkerbell project](https://tinkerbell.org).
 
 ## Getting Started
 
-
 ### Prerequisites
+
 1. Get two machine, one is provisioner which it could be VM, the other one if the bare metal server you'd like to be 
-provisoned by tinkerbell, here we call it worker node.
+provisioned by tinkerbell, here we call it worker node.
+
+[Use the Tinkerbell Terraform module to setup a single provisioner and worker machine](https://tinkerbell.org/setup/packet/)
+
+You will need a Packet account and a personal user access token, not a project-level token.
 
 2. You need setup the tinkerbell provision engine before working on the workflow.
 
-Here are some quick steps.
-
-```
-$ wget https://raw.githubusercontent.com/tinkerbell/tink/master/setup.sh && chmod +x setup.sh
-$ ./setup.sh
+```bash
+curl -sLS https://raw.githubusercontent.com/tinkerbell/tink/master/setup.sh | sh
 ```
 
 ### Build workflow action docker images
 
+Customise the cloud-init stage with an SSH key from the provisioner.
+
+Run `ssh-keygen` on the provisioner, then hit enter to each prompt.
+
+Now run `cat ~/.ssh/id_rsa.pub` and paste the value into the `ssh_authorized_keys` section of `./05-cloud-init/cloud-init.sh`:
+
+```yaml
+		ssh_authorized_keys:
+		 - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8TlZp6SMhZ3OCKxWbRAwOsuk8alXapXb7GQV4DPwZ+ug1AtkDCSSzPGZI6PP3rFILfobQdw6/t/GT3TKwQ1HY2vYqikWXG7YjT6r5IlsaaZ6y3KAuestYx2lG8I+MCbLmvcjo4k2qeJuf2yj331izRkeNRlRx/VWFUAtoCw2Kr2oZK+LbV8Ewv+x6jMVn9+NgxmMj+fHj9ajVtDacVvyJ8cStmRmOyIGd+rPKDb8txJT4FYXIsy5URhioni7QQuJcXN/qqy4TSY+EaYkGUo2j91MuDJZbdQYniOV4ODS8At/a/Ua51x+ia6Y51pCHMvPsm7DFhK13EQUXhIGdPVY3 root@tf-provisioner
 ```
-docker build -t 192.168.1.1/ubuntu:base 00-base/
-docker push 192.168.1.1/ubuntu:base
-docker build -t 192.168.1.1/disk-wipe:v1 01-disk-wipe/ --build-arg REGISTRY=192.168.1.1
-docker push 192.168.1.1/disk-wipe:v1
-docker build -t 192.168.1.1/disk-partition:v101 02-disk-partition/ --build-arg REGISTRY=192.168.1.1
-docker push 192.168.1.1/disk-partition:v1
-docker build -t 192.168.1.1/install-root-fs:v101 03-install-root-fs/ --build-arg REGISTRY=192.168.1.1
-docker push 192.168.1.1/install-root-fs:v1
-docker build -t 192.168.1.1/install-grub:v1 04-install-grub/ --build-arg REGISTRY=192.168.1.1
-docker push 192.168.1.1/install-grub:v101
-docker build -t 192.168.1.1/cloud-init:v1 05-cloud-init/ --build-arg REGISTRY=192.168.1.1
-docker push 192.168.1.1/cloud-init:v1
+
+Each image from 00-07 will be created as a Docker image and then pushed to the registry.
+
+```bash
+./create_images.sh
 ```
 
 ### Build provision images for worker
-Build rootfs/kernel/modules/initrd images, please take packet image build as reference 
-https://github.com/packethost/packet-images
 
+Archives will be required for:
+* rootfs
+* kernel
+* modules
+* initrd
 
-```
-root@tink-provisioner:/var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04# ls -l *tar.gz
--rw-r--r-- 1 root root 688419310 May 15 19:50 image.tar.gz
--rw-r--r-- 1 root root  25406438 May 15 19:50 initrd.tar.gz
--rw-r--r-- 1 root root   7927566 May 15 19:50 kernel.tar.gz
--rw-r--r-- 1 root root  65400456 May 15 19:50 modules.tar.gz
-```
-After you have all the images, you need copy all of them to the OSIE directory
-```
-root@tink-provisioner:/var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04# pwd
-/var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04
+Since we are using Packet's infrastructure, we can also use their image builder and custom repository.
+
+A Docker build will be run to reproduce for tar.gz files which need to be copied into Nginx's root, where OSIE will serve them to the worker.
+
+The initial Terraform uses the c3.small.x86 worker type, so use the following parameters to configure Ubuntu 18.04.
+
+```bash
+apt update && apt install -qy git git-lfs fakeroot
+git clone https://github.com/packethost/packet-images
+cd packet-images
+git install git-lts
+
+# This will take a few minutes
+./tools/build.sh -d ubuntu_18_04 -p c3.small.x86 -a x86_64 -b ubuntu_18_04-c3.small.x86
+
+# Now copy the output so that it's available to be served over HTTP
+mkdir -p /var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04
+cp *.tar.gz /var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04/
 ```
 
-### Configure tink workflow
+```bash
+# ls -l /var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04/
+total 397756                                                                                    
+-rw-r--r-- 1 root root 278481368 May 19 08:54 image.tar.gz                                      
+-rw-r--r-- 1 root root  25380938 May 19 08:54 initrd.tar.gz                                     
+-rw-r--r-- 1 root root   7896480 May 19 08:54 kernel.tar.gz                                     
+-rw-r--r-- 1 root root  65386698 May 19 08:54 modules.tar.gz                                    
+```
+
+### Register the hardware
 
 1. Download this repo to your provisioner
-2. Modify the generate.sh file to create the hardware.json file for your baremetal server
-```
-root@tink-provisioner:~/tink-workflow# vim generate.sh
+
+2. Use `vim` to modify the `generate.sh` file to create the hardware.json file for your baremetal server
+
+```bash
 #!/bin/bash
 
 export UUID=$(uuidgen|tr "[:upper:]" "[:lower:]")  #UUID will be generated by uuidgen
@@ -67,24 +90,46 @@ cat hardware.json | envsubst  > hw1.json
 
 echo wrote hw1.json - $UUID
 ```
+
+Now run `./generate.sh` to create the `hw1.json` file which contains the MAC address and a unique UUID.
+
 3. Login into tink-cli client and push hw1.json and ubuntu.tmpl into tink
 You need copy both hw1.json and ubuntu.tmpl file to tink cli before you can push them into tink
+
 3.1 Create hardware
-```
-root@tink-provisioner:~/tink-workflow# docker exec -it deploy_tink-cli_1 sh
+
+```bash
+# Run the CLI from within Docker
+docker exec -it deploy_tink-cli_1 sh
+
 # push the hardware information to tink database
 /tmp # tink hardware push --file /tmp/hw1.json
 ```
-3.2 Create workflow template
+
+### Create the template and workflow
+
+1. Create workflow template
+
+```bash
+# Save ubuntu.tmpl to a file /tmp/ubuntu.tmpl
+
+# Create a template based upon the output
+tink template create -n 'ubuntu' -p /tmp/ubuntu.tmpl
 ```
-/tmp # tink template create -n 'ubuntu' -p /tmp/ubuntu.tmpl
-```
-3.3 Create workflow
-```
-/tmp# tink workflow create -t <template-uuid> -r '{"device_1": $ <MAC of your worker PXE port>}'
+
+1.1 Create workflow
+
+```bash
+# See the output from Terraform
+export MAC="<MAC of your worker PXE port>"
+
+# See tink template list
+export TEMPLATE_ID="<template-uuid>"
+tink workflow create -t "$TEMPLATE_ID" -r '{"device_1": "'$MAC'"}'
 ```
 
 ### Reboot worker
+
 Reboot worker node will trigger workflow starts and you can monitoring the workflow events
 ```
 /tmp #  tink workflow events  f588090f-e64b-47e9-b8d0-a3eed1dc5439
@@ -102,11 +147,35 @@ Reboot worker node will trigger workflow starts and you can monitoring the workf
 +--------------------------------------+-----------------+-----------------+----------------+---------------------------------+--------------------+
 ```
 
+Important note: if you need to re-run the provisioning workflow, you need to run `tink workflow create` again.
+
+### Change the boot order
+
+You now need to stop the machine from netbooting.
+
+Go to the Packet dashboard and click "Server Actions" -> "Disable Always PXE boot". This setting can be toggled as required, or if you need to reprovision a machine.
+
+Now reboot the worker machine, and it should show GRUB before booting Ubuntu.
+
+The username and password are both `ubuntu` and this must be changed on first logon. To change or to remove the password edit `./05-cloud-init/cloud-init.sh`.
+
+You can connect with the packet SOS ssh console or over SSH from the worker, the IP should be 192.168.1.5.
+
+```bash
+ssh ubuntu@192.168.1.5
+```
+
+## Questions and comments
+
+Please direct queries to #tinkerbell on [Packet's Slack channel](https://slack.packet.com/)
+
 ## Authors
 
-* **Xin Wang** - *Initial work* - [tink-workflow](https://github.com/wangxin311/tink-workflow)
+This work is derived [from a sample by Packet and Infracloud](https://github.com/tinkerbell/tink/tree/first-good-workflow/workflow-samples/ubuntu)
 
-See also the list of [contributors](https://github.com/wangxin311/tink-workflow/graphs/contributors) who participated in this project.
+* **Xin Wang** - *Initial set of fixes and adding cloud-init* - [tink-workflow](https://github.com/wangxin311/tink-workflow)
+* **Alex Ellis** - Fixed networking and other bugs, user experience & README
 
-## License
+License: Apache 2.0
 
+Copyright: [tink-workflow authors](https://github.com/wangxin311/tink-workflow/graphs/contributors)
