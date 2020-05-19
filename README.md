@@ -19,6 +19,19 @@ You will need a Packet account and a personal user access token, not a project-l
 curl -sLS https://raw.githubusercontent.com/tinkerbell/tink/master/setup.sh | sh
 ```
 
+### Fix NAT
+
+```bash
+
+# Fix Docker from interfering with NAT
+iptables -I DOCKER-USER -i src_if -o dst_if -j ACCEPT
+
+# Now setup NAT from the internal network to the public network
+iptables -t nat -A POSTROUTING -o bond0 -j MASQUERADE
+iptables -A FORWARD -i bond0 -o enp1s0f1 -m state   --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -i enp1s0f1 -o bond0 -j ACCEPT 
+```
+
 ### Build workflow action docker images
 
 Customise the cloud-init stage with an SSH key from the provisioner.
