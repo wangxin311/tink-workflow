@@ -114,7 +114,6 @@ iface enp1s0f0 inet dhcp
 EOF
 
 cat <<EOF >$target/etc/resolv.conf
-nameserver 192.168.1.1
 nameserver 1.1.1.1
 EOF
 
@@ -126,5 +125,5 @@ network:
     enp1s0f0:                  
       dhcp4: yes               
       nameservers:             
-          addresses: [192.168.1.1, 1.1.1.1] 
+          addresses: [1.1.1.1] 
 EOF
