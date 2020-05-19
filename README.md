@@ -21,6 +21,17 @@ curl -sLS https://raw.githubusercontent.com/tinkerbell/tink/master/setup.sh | sh
 
 ### Build workflow action docker images
 
+Customise the cloud-init stage with an SSH key from the provisioner.
+
+Run `ssh-keygen` on the provisioner, then hit enter to each prompt.
+
+Now run `cat ~/.ssh/id_rsa.pub` and paste the value into the `ssh_authorized_keys` section of `./05-cloud-init/cloud-init.sh`:
+
+```yaml
+		ssh_authorized_keys:
+		 - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8TlZp6SMhZ3OCKxWbRAwOsuk8alXapXb7GQV4DPwZ+ug1AtkDCSSzPGZI6PP3rFILfobQdw6/t/GT3TKwQ1HY2vYqikWXG7YjT6r5IlsaaZ6y3KAuestYx2lG8I+MCbLmvcjo4k2qeJuf2yj331izRkeNRlRx/VWFUAtoCw2Kr2oZK+LbV8Ewv+x6jMVn9+NgxmMj+fHj9ajVtDacVvyJ8cStmRmOyIGd+rPKDb8txJT4FYXIsy5URhioni7QQuJcXN/qqy4TSY+EaYkGUo2j91MuDJZbdQYniOV4ODS8At/a/Ua51x+ia6Y51pCHMvPsm7DFhK13EQUXhIGdPVY3 root@tf-provisioner
+```
+
 Each image from 00-07 will be created as a Docker image and then pushed to the registry.
 
 ```bash

@@ -35,11 +35,12 @@ if [ -f $target/etc/cloud/cloud.cfg ]; then
 		   gecos: Default user
 		   groups: admin
 		   sudo: true
+		   shell: /bin/bash
 		chpasswd:
 		 list: |
 		   ubuntu:ubuntu
 		bootcmd:
-		 - echo 192.168.1.1 kw-tf-provisioner |tee -a /etc/hosts
+		 - echo 192.168.1.1 kw-tf-provisioner | tee -a /etc/hosts
 		 - systemctl disable network-online.target
 		 - systemctl mask network-online.target
 		runcmd:
