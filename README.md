@@ -165,6 +165,10 @@ You can connect with the packet SOS ssh console or over SSH from the worker, the
 ssh ubuntu@192.168.1.5
 ```
 
+## Questions and comments
+
+Please direct queries to #tinkerbell on [Packet's Slack channel](https://slack.packet.com/)
+
 ## Authors
 
 This work is derived [from a sample by Packet and Infracloud](https://github.com/tinkerbell/tink/tree/first-good-workflow/workflow-samples/ubuntu)
