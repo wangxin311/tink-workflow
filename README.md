@@ -63,6 +63,16 @@ chmod +x get-ubuntu-image
 wget https://raw.githubusercontent.com/packethost/packet-images/master/tools/packet-save2image
 #5. set packet-save2image to executable
 chmod +x packet-save2image
+#6. Download Dockerfile
+wget https://raw.githubusercontent.com/packethost/packet-images/ubuntu_18_04-base/x86_64/Dockerfile
+#7. Download Image:
+./get-ubuntu-image 16.04 x86_64 .
+#8. Build:
+docker build -t custom-ubuntu-16 .
+#9. Save
+docker save custom-ubuntu-16 > custom-ubuntu-16.tar
+#10. Package:
+./packet-save2image < custom-ubuntu-16.tar > image.tar.gz
 
 # This will take a few minutes
 ./tools/build.sh -d ubuntu_18_04 -p c3.small.x86 -a x86_64 -b ubuntu_18_04-c3.small.x86
