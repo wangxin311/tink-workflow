@@ -101,6 +101,10 @@ cat <<EOF >$target/etc/cloud/cloud.cfg.d/90_dpkg.cfg
 datasource_list: [ NoCloud ]
 EOF
 
+## Note
+
+# Change enp1s0f0 to eno1 if working with a local on-premises machine.
+
 cat <<EOF >$target/etc/network/interfaces
 auto lo
 iface lo inet loopback
@@ -109,11 +113,17 @@ auto enp1s0f0
 iface enp1s0f0 inet dhcp
 EOF
 
+cat <<EOF >$target/etc/resolv.conf
+nameserver 1.1.1.1
+EOF
+
 cat <<EOF >$target/etc/netplan/01-netcfg.yaml
-network:
-  version: 2
-  renderer: networkd
-  ethernets:
-    enp1s0f0:
-      dhcp4: yes
+network:                       
+  version: 2                   
+  renderer: networkd           
+  ethernets:                   
+    enp1s0f0:                  
+      dhcp4: yes               
+      nameservers:             
+          addresses: [1.1.1.1] 
 EOF
