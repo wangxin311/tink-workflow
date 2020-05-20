@@ -68,6 +68,32 @@ A Docker build will be run to reproduce for tar.gz files which need to be copied
 The initial Terraform uses the c3.small.x86 worker type, so use the following parameters to configure Ubuntu 18.04.
 
 ```bash
+apt update && apt install -qy git git-lfs fakeroot
+git clone https://github.com/packethost/packet-images
+cd packet-images
+git-lts install
+
+# This will take a few minutes
+./tools/build.sh -d ubuntu_18_04 -p c3.small.x86 -a x86_64 -b ubuntu_18_04-c3.small.x86
+
+# Now copy the output so that it's available to be served over HTTP
+mkdir -p /var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04
+cp *.tar.gz /var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04/
+```
+
+```bash
+# ls -l /var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04/
+total 397756                                                                                    
+-rw-r--r-- 1 root root 278481368 May 19 08:54 image.tar.gz                                      
+-rw-r--r-- 1 root root  25380938 May 19 08:54 initrd.tar.gz                                     
+-rw-r--r-- 1 root root   7896480 May 19 08:54 kernel.tar.gz                                     
+-rw-r--r-- 1 root root  65386698 May 19 08:54 modules.tar.gz                                    
+```
+
+Alternatively run:
+
+
+```bash
 # 1. git-lfs
 apt-get install git-lfs
 #2. get-ubuntu-image
@@ -88,22 +114,6 @@ docker build -t custom-ubuntu-16 .
 docker save custom-ubuntu-16 > custom-ubuntu-16.tar
 #10. Package:
 ./packet-save2image < custom-ubuntu-16.tar > image.tar.gz
-
-# This will take a few minutes
-./tools/build.sh -d ubuntu_18_04 -p c3.small.x86 -a x86_64 -b ubuntu_18_04-c3.small.x86
-
-# Now copy the output so that it's available to be served over HTTP
-mkdir -p /var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04
-cp *.tar.gz /var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04/
-```
-
-```bash
-# ls -l /var/tinkerbell/nginx/misc/osie/current/ubuntu_18_04/
-total 397756                                                                                    
--rw-r--r-- 1 root root 278481368 May 19 08:54 image.tar.gz                                      
--rw-r--r-- 1 root root  25380938 May 19 08:54 initrd.tar.gz                                     
--rw-r--r-- 1 root root   7896480 May 19 08:54 kernel.tar.gz                                     
--rw-r--r-- 1 root root  65386698 May 19 08:54 modules.tar.gz                                    
 ```
 
 ### Register the hardware
