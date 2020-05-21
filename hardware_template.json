@@ -1,5 +1,5 @@
 {
-  "id": "9e6fc2c3-7f6d-46db-aa28-d55f4bd3aff8",
+  "id": "$UUID",
   "arch": "x86_64",
   "allow_pxe": true,
   "allow_workflow": true,
@@ -18,9 +18,9 @@
   "plan_slug": "c3.small.x86",
   "instance": {
       "ssh_keys": [
-        "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiKZts/sKvjhuVC7iod0zSgYlfnH822HqFwkUzsObnKDZcbmv3+gnVHplLlBesK5USVCdOK2Qb4SkjCAeDcsj10ijJfkJlTo8HVKUx4OBXIfOAZyAIhoCgzXTwXReVPeg9uvhRhctiKM2DqXGCAA4ZrwRoXaZy3WntqUhr805XB3waTWXlkbgZEKc9I0G8mN7pI0afJYIjylhRvHad0fCR+zSHogJ/JUVm4+pcfAdP7UfckpBU74lIavm/lbyRBbN0d341GCRWjlO0RKnz9guxqywctuUI6UvOhBU301tckhXsOSfeyWPuzhPOc1xUpXOpPyY/izPpyIIBMSztPr0F root@kw-tf-provisioner"
+        "$SSHKEY"
       ],
-      "userdata": "YXB0OgogIHByZXNlcnZlX3NvdXJjZXNfbGlzdDogdHJ1ZQpkaXNhYmxlX3Jvb3Q6IDAKcGFja2FnZV9yZWJvb3RfaWZfcmVxdWlyZWQ6IGZhbHNlCnBhY2thZ2VfdXBkYXRlOiBmYWxzZQpwYWNrYWdlX3VwZ3JhZGU6IGZhbHNlCmhvc3RuYW1lOiBrdy10Zi13b3JrZXIKYm9vdGNtZDoKIC0gZWNobyAxOTIuMTY4LjEuMSBrdy10Zi1wcm92aXNpb25lciA+IC9ldGMvaG9zdHMKcnVuY21kOgogLSB0b3VjaCAvZXRjL2Nsb3VkL2Nsb3VkLWluaXQuZGlzYWJsZWQKc3NoX2dlbmtleXR5cGVzOiBbJ3JzYScsICdkc2EnLCAnZWNkc2EnLCAnZWQyNTUxOSddCnNzaF9wd2F1dGg6IFRydWUK",
+      "userdata": "$USERDATA",
       "storage": {
             "disks": [
                 {
@@ -85,7 +85,7 @@
   "network_ports": [
     {
       "data": {
-      "mac": "b8:59:9f:e0:f6:8c"
+      "mac": "$MAC"
       },
       "name": "eth0",
       "type": "data"

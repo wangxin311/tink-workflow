@@ -13,6 +13,13 @@ mount -t ext4 /dev/sda3 $target
 ephemeral=/workflow/data.json
 OS=$(jq -r .os "$ephemeral")
 
+touch /metadata
+metadata=/metadata
+curl --connect-timeout 60 http://$MIRROR_HOST:50061/metadata > $metadata
+check_required_arg "$metadata" 'metadata file' '-M'
+
+declare ssh_keys && set_from_metadata ssh_keys 'instance.ssh_keys[0]' <"$metadata"
+declare userdata && set_from_metadata userdata 'instance.userdata' <"$metadata"
 
 echo -e "${GREEN}#### Configuring cloud-init for Packet${NC}"
 if [ -f $target/etc/cloud/cloud.cfg ]; then
@@ -30,15 +37,12 @@ if [ -f $target/etc/cloud/cloud.cfg ]; then
 		package_upgrade: false
 		hostname: kw-tf-worker
 		users:
-		 - default
-		 - name: ubuntu
-		   gecos: Default user
-		   groups: admin
-		   sudo: true
-		   shell: /bin/bash
-		chpasswd:
-		 list: |
-		   ubuntu:ubuntu
+		  - name: ubuntu
+		    groups: users
+		    sudo: ['ALL=(ALL) NOPASSWD:ALL']
+		    shell: /bin/bash
+		    ssh-authorized-keys:
+		      - USER_SSH_KEY
 		bootcmd:
 		 - echo 192.168.1.1 kw-tf-provisioner | tee -a /etc/hosts
 		 - systemctl disable network-online.target
@@ -47,8 +51,6 @@ if [ -f $target/etc/cloud/cloud.cfg ]; then
 		 - touch /etc/cloud/cloud-init.disabled
 		ssh_genkeytypes: ['rsa', 'dsa', 'ecdsa', 'ed25519']
 		ssh_pwauth: True
-		ssh_authorized_keys:
-		 - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC8TlZp6SMhZ3OCKxWbRAwOsuk8alXapXb7GQV4DPwZ+ug1AtkDCSSzPGZI6PP3rFILfobQdw6/t/GT3TKwQ1HY2vYqikWXG7YjT6r5IlsaaZ6y3KAuestYx2lG8I+MCbLmvcjo4k2qeJuf2yj331izRkeNRlRx/VWFUAtoCw2Kr2oZK+LbV8Ewv+x6jMVn9+NgxmMj+fHj9ajVtDacVvyJ8cStmRmOyIGd+rPKDb8txJT4FYXIsy5URhioni7QQuJcXN/qqy4TSY+EaYkGUo2j91MuDJZbdQYniOV4ODS8At/a/Ua51x+ia6Y51pCHMvPsm7DFhK13EQUXhIGdPVY3 root@tf-provisioner
 		cloud_init_modules:
 		 - migrator
 		 - bootcmd
@@ -82,6 +84,9 @@ if [ -f $target/etc/cloud/cloud.cfg ]; then
 		 - keys-to-console
 		 - final-message
 	EOF
+	echo "Set the default user SSH key"
+	sed -i "s%USER_SSH_KEY%$ssh_keys%g" $target/etc/cloud/cloud.cfg
+
 	echo "Disabling cloud-init based network config via cloud.cfg.d include"
 	echo "network: {config: disabled}" >$target/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
 	echo "WARNING: Removing /var/lib/cloud/*"
@@ -109,12 +114,13 @@ cat <<EOF >$target/etc/network/interfaces
 auto lo
 iface lo inet loopback
 #
-auto enp1s0f0
-iface enp1s0f0 inet dhcp
+auto eno2
+iface eno2 inet dhcp
 EOF
 
 cat <<EOF >$target/etc/resolv.conf
 nameserver 1.1.1.1
+nameserver 8.8.8.8
 EOF
 
 cat <<EOF >$target/etc/netplan/01-netcfg.yaml
@@ -125,5 +131,5 @@ network:
     enp1s0f0:                  
       dhcp4: yes               
       nameservers:             
-          addresses: [1.1.1.1] 
+          addresses: [1.1.1.1, 8.8.8.8] 
 EOF

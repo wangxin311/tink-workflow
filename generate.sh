@@ -2,8 +2,11 @@
 
 export UUID=$(uuidgen|tr "[:upper:]" "[:lower:]")
 export MAC=b8:59:9f:e0:f6:8c
-cat hardware.json | envsubst  > hw1.json
+export SSHKEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCiKZts/sKvjhuVC7iod0zSgYlfnH822HqFwkUzsObnKDZcbmv3+gnVHplLlBesK5USVCdOK2Qb4SkjCAeDcsj10ijJfkJlTo8HVKUx4OBXIfOAZyAIhoCgzXTwXReVPeg9uvhRhctiKM2DqXGCAA4ZrwRoXaZy3WntqUhr805XB3waTWXlkbgZEKc9I0G8mN7pI0afJYIjylhRvHad0fCR+zSHogJ/JUVm4+pcfAdP7UfckpBU74lIavm/lbyRBbN0d341GCRWjlO0RKnz9guxqywctuUI6UvOhBU301tckhXsOSfeyWPuzhPOc1xUpXOpPyY/izPpyIIBMSztPr0F root@kw-tf-provisioner"
+export USERDATA="YXB0OgogIHByZXNlcnZlX3NvdXJjZXNfbGlzdDogdHJ1ZQpkaXNhYmxlX3Jvb3Q6IDAKcGFja2FnZV9yZWJvb3RfaWZfcmVxdWlyZWQ6IGZhbHNlCnBhY2thZ2VfdXBkYXRlOiBmYWxzZQpwYWNrYWdlX3VwZ3JhZGU6IGZhbHNlCmhvc3RuYW1lOiBrdy10Zi13b3JrZXIKYm9vdGNtZDoKIC0gZWNobyAxOTIuMTY4LjEuMSBrdy10Zi1wcm92aXNpb25lciA+IC9ldGMvaG9zdHMKcnVuY21kOgogLSB0b3VjaCAvZXRjL2Nsb3VkL2Nsb3VkLWluaXQuZGlzYWJsZWQKc3NoX2dlbmtleXR5cGVzOiBbJ3JzYScsICdkc2EnLCAnZWNkc2EnLCAnZWQyNTUxOSddCnNzaF9wd2F1dGg6IFRydWUK"
 
-echo wrote hw1.json - $UUID
+cat hardware_template.json | envsubst  > hardware.json
+
+echo wrote hardware.json - $UUID
 
 
