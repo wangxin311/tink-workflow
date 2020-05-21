@@ -40,7 +40,7 @@ Customise the cloud-init stage with an SSH key from the provisioner.
 
 Run `ssh-keygen` on the provisioner, then hit enter to each prompt.
 
-Now run `cat ~/.ssh/id_rsa.pub` and paste the value into the `ssh_authorized_keys` section of `./05-cloud-init/cloud-init.sh`:
+Now run `cat ~/.ssh/id_rsa.pub` and paste the value into the generate.sh
 
 ```yaml
 		ssh_authorized_keys:
