@@ -75,6 +75,10 @@ setup_disks() {
 			partlabel=$(stormeta "disks[$diskcnt].partitions[$partcnt].label")
 			partnum=$(stormeta "disks[$diskcnt].partitions[$partcnt].number")
 			partsize=$(stormeta "disks[$diskcnt].partitions[$partcnt].size")
+			# if partition size is not defined, then set it to 0, this means use the rest of the disk
+			if [[ $partsize == null ]]; then
+				partsize=0
+			fi
 			parttype=8300
 			msg "Working on $disk part $partnum aka label $partlabel with size $partsize"
 
