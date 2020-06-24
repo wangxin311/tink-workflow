@@ -64,7 +64,7 @@ cpr_url=$(sed -nr 's|.*\bcpr_url=(\S+).*|\1|p' "$userdata")
 
 if [[ -z ${cpr_url} ]]; then
         echo "Using default image since no cpr_url provided"
-        jq -c '.instance.storage' "$metadata" >$cprconfig
+        jq -c '.metadata.instance.storage' "$metadata" >$cprconfig
 else
         echo "NOTICE: Custom CPR url found!"
         echo "Overriding default CPR location with custom cpr_url"
