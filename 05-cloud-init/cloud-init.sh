@@ -19,7 +19,7 @@ curl --connect-timeout 60 http://$MIRROR_HOST:50061/metadata > $metadata
 check_required_arg "$metadata" 'metadata file' '-M'
 
 declare ssh_keys && set_from_metadata ssh_keys 'metadata.instance.ssh_keys[0]' <"$metadata"
-declare userdata && set_from_metadata userdata 'metadatainstance.userdata' <"$metadata"
+declare userdata && set_from_metadata userdata 'metadata.instance.userdata' <"$metadata"
 
 echo -e "${GREEN}#### Configuring cloud-init for Packet${NC}"
 if [ -f $target/etc/cloud/cloud.cfg ]; then
