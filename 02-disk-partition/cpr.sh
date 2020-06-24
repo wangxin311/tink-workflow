@@ -102,8 +102,11 @@ setup_disks() {
 
 				msg "Creating a partition $partpct% the size of disk $disk ($disksize) resulting in partition size $npartsize sectors"
 				partsize=+$npartsize
-			elif ((partsize == 0)); then
-				msg "Partsize is zero. This means use the rest of the disk."
+			elif [[ $partsize == 0 ]]; then
+				msg "Partsize is zero, This means use the rest of the disk"
+			elif [[ $partsize == null ]]; then
+				partsize=0
+				msg "Partsize is undefined, set to the default value 0 and this also means use the rest of the disk."
 			else
 				partsize="+$partsize"
 			fi
